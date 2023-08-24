@@ -8,10 +8,10 @@ This codebase uses Keras, TensorFlow, and PyTorch to scan a video feed from the 
 
 ### On Linux PC
 
-1. Create a virtual environment in the code folder: `virtualenv env` or `python3 -m venv env`
-2. Activate the virtual environment: `source env/bin/activate`
-3. Install the required packages: `pip3 install -r requirements/requirements.txt`
-4. Run the code: `python3 sharingan.py`
+1. Create a virtual environment in the code folder: `virtualenv env` or `python3 -m venv env`.
+2. Activate the virtual environment: `source env/bin/activate`.
+3. Install the required packages: `pip3 install -r requirements/requirements.txt`.
+4. Run the code: `python3 sharingan.py`.
 
 ### On Jetson
 
