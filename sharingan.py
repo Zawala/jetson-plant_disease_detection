@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 from __future__ import division, print_function
 # coding=utf-8
 import numpy as np
@@ -20,6 +21,9 @@ import cv2
 
 
 
+=======
+from imports import *
+>>>>>>> Stashed changes
 #from train import Model as plantmodel
 
 class ObjectDetection:
@@ -45,16 +49,43 @@ class ObjectDetection:
         #self.model.classes = [0] # set model to only detect "Person" class
 
     def load_model(self, filepath):
+<<<<<<< Updated upstream
         model = load_model(filepath)
         return model
     
     def score_frame(self, frame):
+=======
+        """
+        Function loads the yolo5 model from PyTorch Hub.
+        """
+        #model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
+        #model = torch.load('model_a.pth')
+        checkpoint = torch.load(filepath)
+        model = models.resnet18()
+        classifier = nn.Sequential(OrderedDict([
+                          ('fc1', nn.Linear(512, 512)),
+                          ('relu', nn.ReLU()),
+                          #('dropout1', nn.Dropout(p=0.2)),
+                          ('fc2', nn.Linear(512, 39)),
+                          ('output', nn.LogSoftmax(dim=1))
+                          ]))
+
+        # Replacing the pretrained model classifier with our classifier
+        model.fc = classifier
+
+    
+        model.load_state_dict(checkpoint['state_dict'])
+        
+        return model, checkpoint['class_to_idx']
+
+    def score_frame(self, frame, topk=1):
+>>>>>>> Stashed changes
         """
         function scores each frame of the video and returns results.
         :param frame: frame to be infered.
         :return: labels and coordinates of objects found.
-
         """
+<<<<<<< Updated upstream
         pil_image = Image.fromarray(frame).convert('RGB')
         image_np = np.array([self.process_image(pil_image)])
 
@@ -186,6 +217,56 @@ class ObjectDetection:
         #right = (width + min_dim) // 2
         #bottom = (height + min_dim) // 2
         #image = image.crop((left, top, right, bottom))
+=======
+        image_np = np.array([self.process_image(Image.open(frame))])
+        image = torch.FloatTensor(image_np)
+        self.model.eval()
+        output = self.model.forward(Variable(image))
+        pobabilities = torch.exp(output).data.numpy()[0]
+    
+
+        top_idx = np.argsort(pobabilities)[-topk:][::-1] 
+        top_class = [self.idx_to_class[x] for x in top_idx]
+        top_probability = pobabilities[top_idx]
+
+        return top_probability, top_class
+    
+    def draw_predictions(self,image_raw):
+        
+        # Load an image
+        image = Image.open(image_raw)
+
+        # Create a drawing object
+        draw = ImageDraw.Draw(image)
+
+        # Define the coordinates of the top-left and bottom-right corners of the rectangle
+        top_left = (50, 50)
+        bottom_right = (150, 150)
+
+#       Define the color of the rectangle (in RGB format)
+        color = (0, 255, 0)
+
+#       Draw the rectangle on the image
+        draw.rectangle([top_left, bottom_right], outline=color, width=2)
+
+#       Define the text to be displayed and its position
+
+        text = self.score_frame(image_raw)
+        text_position = (50, 40)
+
+#           Define the font and size of the text
+        font = ImageFont.truetype('arial.ttf', size=12)
+
+                # Draw the text on the image
+        draw.text(text_position, text[1][0], fill=color, font=font)
+
+#        Display the image with the rectangle and text
+        image.show()
+         
+
+    def process_image(self, image):
+        
+>>>>>>> Stashed changes
         size = 256, 256
         image.thumbnail(size, Image.Resampling.LANCZOS)
         image = image.crop((128 - 112, 128 - 112, 128 + 112, 128 + 112))
@@ -209,30 +290,32 @@ class ObjectDetection:
         return npImage
     
 
-    #def imshow(self, image, ax=None, title=None):
-        #if ax is None:
-       #     fig, ax = plt.subplots()
+    def imshow(self, image, ax=None, title=None):
+        if ax is None:
+            fig, ax = plt.subplots()
     
     # PyTorch tensors assume the color channel is the first dimension
     # but matplotlib assumes is the third dimension
-      #  image = image.numpy().transpose((1, 2, 0))
+        image = image.numpy().transpose((1, 2, 0))
     
     # Undo preprocessing
-     #   mean = np.array([0.485, 0.456, 0.406])
-    #    std = np.array([0.229, 0.224, 0.225])
-   #     image = std * image + mean
+        mean = np.array([0.485, 0.456, 0.406])
+        std = np.array([0.229, 0.224, 0.225])
+        image = std * image + mean
     
     # Image needs to be clipped between 0 and 1 or it looks like noise when displayed
-  #      image = np.clip(image, 0, 1)
+        image = np.clip(image, 0, 1)
     
- #       ax.imshow(image)
+        ax.imshow(image)
     
- #       return ax
+        return ax
     
     
     def __call__(self):
-       self.draw_predictions()
+       print(self.draw_predictions('image (2).JPG'))
 
 
+#link = sys.argv[1]
+output_file = 'Labeled_Video.avi'
 a = ObjectDetection()
 a()

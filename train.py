@@ -1,16 +1,7 @@
-from collections import OrderedDict
-import time
-from torch.optim import lr_scheduler
-import copy
-#=============================#
-#pytorch imports              #
-#=============================#
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torchvision.models import ResNet18_Weights
+from imports import *
 from data import *
-model = models.resnet18(weights=ResNet18_Weights.DEFAULT)
+import pprint
+model = models.resnet18(pretrained=True)
 # Freeze parameters so we don't backprop through them
 
 for param in model.parameters():
@@ -100,7 +91,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=10):
     return model
 
 # Train a model with a pre-trained network
-num_epochs = 30
+num_epochs = 10
 if use_gpu:
     print ("Using GPU: "+ str(use_gpu))
     model = model.cuda()
@@ -114,7 +105,7 @@ optimizer = optim.Adam(model.fc.parameters(), lr=0.001)
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
 
 
-model_ft = train_model(model, criterion, optimizer, exp_lr_scheduler, num_epochs=30)
+model_ft = train_model(model, criterion, optimizer, exp_lr_scheduler, num_epochs=10)
 
 # Save the checkpoint 
 
@@ -128,4 +119,4 @@ checkpoint = {'input_size': [3, 224, 224],
                   'optimizer_dict':optimizer.state_dict(),
                   'class_to_idx': model.class_to_idx,
                   'epoch': model.epochs}
-torch.save(checkpoint, 'res18tomato_checkpoint.pth')
+torch.save(checkpoint, 'res18_checkpoint.pth')

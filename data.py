@@ -1,11 +1,4 @@
-import os
-#=============================#
-#pytorch imports              #
-#=============================#
-import torch
-#import torch.utils.data as data
-from torchvision import models, datasets, transforms
-
+from imports import *
 from os import path
 
 train_on_gpu = torch.cuda.is_available()
